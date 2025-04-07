@@ -20,32 +20,21 @@ jobs:
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: Install dependencies
         run: npm install
+      - name: Change Directory to frontEnd and install deps
+        run: |
+          cd phonebook
+          npm install
+          cd ..
       - name: Check style
         run: npm run lint
       - name: Make a prod build
         shell: pwsh
         run: npm run build:ui
-      - name: Notification if build fails
-        if: ${{ failure() }}
-        uses: rjstone/discord-webhook-notify@1399c1b2d57cc05894d506d2cfdc33c5f012b993
-        with:
-          severity: error
-          text: 'Build failed'
-          description: 'commit ${{github.event.commits[0].url}} by ${{ github.event.pusher.name }} broke the build :('
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
       - name: Deployment
         if: ${{ github.event_name == 'push' && !contains(toJson(join(github.event.commits.*.message)), '#skip') }}
         run: flyctl deploy --remote-only
         env: 
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-      - name: Notification when deployment succeeds
-        if: ${{ success() && github.event_name == 'push' }}
-        uses: rjstone/discord-webhook-notify@1399c1b2d57cc05894d506d2cfdc33c5f012b993
-        with:
-          severity: info
-          text: 'Deployment successful'
-          description: 'commit ${{github.event.commits[0].url}} by ${{ github.event.pusher.name }} deployed successfully'
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
   tag_release:
     needs: [deployment_pipeline]
     runs-on: ubuntu-20.04
