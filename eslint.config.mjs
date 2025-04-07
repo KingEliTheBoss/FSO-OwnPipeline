@@ -49,6 +49,6 @@ export default [
     },
   },
   {
-    ignores: ["dist/**", "build/**"],
+    ignores: ["dist/**", "build/**", "phonebook/**"],
   },
 ];
