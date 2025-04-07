@@ -23,6 +23,7 @@ jobs:
       - name: Check style
         run: npm run lint
       - name: Make a prod build
+        shell: pwsh
         run: npm run build:ui
       - name: Notification if build fails
         if: ${{ failure() }}
